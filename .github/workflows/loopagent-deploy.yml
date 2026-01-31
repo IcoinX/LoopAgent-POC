@@ -1,35 +1,34 @@
-
 name: LoopAgent: Deploy POC
-
 on:
-workflow_dispatch:
-push:
-branches: [ "main" ]
+  workflow_dispatch:
+  push:
+    branches: [ "main" ]
 
 jobs:
-deploy:
-runs-on: ubuntu-latest
-steps:
-- name: Checkout repo
-uses: actions/checkout@v4
-  - name: Set up Git
-    run: |
-      git config user.name "LoopAgent CI"
-      git config user.email "no-reply@loopagent.local"
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
 
-  - name: Prepare deploy branch
-    run: |
-      git checkout -B loopagent-poc || git branch -M loopagent-poc
-      rm -rf loopagent-poc || true
-      mkdir -p loopagent-poc
-      echo "Place your POC files here via uploads" > loopagent-poc/README.md
-      git add loopagent-poc
-      git commit -m "chore(ci): bootstrap loopagent-poc" || echo "no changes"
+      - name: Set up Git
+        run: |
+          git config user.name "LoopAgent CI"
+          git config user.email "no-reply@loopagent.local"
 
-  - name: Push changes using secret token
-    env:
-      TOKEN: ${{ secrets.LOOP_AGENT_TOKEN }}
-    run: |
-      git remote set-url origin https://x-access-token:${TOKEN}@github.com/${{ github.repository }}.git
-      git push origin loopagent-poc --force
+      - name: Prepare deploy branch
+        run: |
+          git checkout -B loopagent-poc || git branch -M loopagent-poc
+          rm -rf loopagent-poc || true
+          mkdir -p loopagent-poc
+          echo "Place your POC files here via uploads" > loopagent-poc/README.md
+          git add loopagent-poc
+          git commit -m "chore(ci): bootstrap loopagent-poc" || echo "no changes"
+
+      - name: Push changes using secret token
+        env:
+          TOKEN: ${{ secrets.LOOP_AGENT_TOKEN }}
+        run: |
+          git remote set-url origin https://x-access-token:${TOKEN}@github.com/${{ github.repository }}.git
+          git push origin loopagent-poc --force
 
